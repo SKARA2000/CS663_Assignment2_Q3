@@ -1,0 +1,284 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>myMainScript</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-09-29"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MyMainScript</a></li><li><a href="#2">Gaussian Blurring and subsampling for Barbara image</a></li><li><a href="#3">Keep last parameter of myPatchBaseFiltering as 'y' for performing hyperparameter tuning and keep it as 'n' for gewnerating optimal rmsd results.</a></li><li><a href="#4">Sub sampling Function</a></li><li><a href="#5">2D COnolution with cropping at the edges</a></li><li><a href="#6">Gaussian Kernel constructing function</a></li><li><a href="#7">Utility function for constructGaussian</a></li></ul></div><h2 id="1">MyMainScript</h2><pre class="codeinput">tic;
+</pre><h2 id="2">Gaussian Blurring and subsampling for Barbara image</h2><pre class="codeinput"><span class="comment">%%sampleImg = myPatchBasedFiltering("../data/barbara.mat", "mat");</span>
+load(<span class="string">"../data/barbara.mat"</span>, <span class="string">'imageOrig'</span>)
+imageOrig = imageOrig./100;
+kernel_gauss = constructGaussian(0.66,9);
+sampleImg = convolution(imageOrig, kernel_gauss);
+sampleImg = subSampler(sampleImg,2);
+<span class="comment">%{
+</span><span class="comment">disp(size(imageOrig));
+</span><span class="comment">disp(size(sampleImg));
+</span><span class="comment">subplot(1,2,1), imshow(imageOrig);
+</span><span class="comment">subplot(1,2,2), imshow(sampleImg);
+</span><span class="comment">%}</span>
+</pre><h2 id="3">Keep last parameter of myPatchBaseFiltering as 'y' for performing hyperparameter tuning and keep it as 'n' for gewnerating optimal rmsd results.</h2><pre class="codeinput">result_RMSD1 = myPatchBasedFiltering(sampleImg, <span class="string">"im"</span>, <span class="string">"barbara"</span>,<span class="string">'n'</span>);
+result_RMSD2 = myPatchBasedFiltering(<span class="string">"../data/grass.png"</span>, <span class="string">"png"</span>, <span class="string">"grass"</span>,<span class="string">'n'</span>);
+result_RMSD3 = myPatchBasedFiltering(<span class="string">"../data/honeyCombReal.png"</span>, <span class="string">"png"</span>, <span class="string">"honeycomb"</span>,<span class="string">'n'</span>);
+toc;
+</pre><pre class="codeoutput">barbara:
+Optimal RMSE=2.494951e-02 
+RMSE for 0.9*sd_space=2.494951e-02 
+RMSE for 1.1*sd_space=2.494951e-02 
+RMSE for 0.9*sd_intensity=2.542819e-02 
+RMSE for 1.1*sd_intensity=2.516775e-02 
+grass:
+Optimal RMSE=3.054581e-02 
+RMSE for 0.9*sd_space=3.054581e-02 
+RMSE for 1.1*sd_space=3.054581e-02 
+RMSE for 0.9*sd_intensity=3.144193e-02 
+RMSE for 1.1*sd_intensity=3.072850e-02 
+honeycomb:
+Optimal RMSE=2.929002e-02 
+RMSE for 0.9*sd_space=2.929002e-02 
+RMSE for 1.1*sd_space=2.929002e-02 
+RMSE for 0.9*sd_intensity=2.972036e-02 
+RMSE for 1.1*sd_intensity=2.981481e-02 
+Elapsed time is 606.740698 seconds.
+</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_06.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_07.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_08.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_09.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_10.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_11.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_12.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_13.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_14.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_15.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_16.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_17.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_18.png" alt=""> <h2 id="4">Sub sampling Function</h2><pre class="codeinput"><span class="keyword">function</span> [resultImg] = subSampler(image,factor)
+    [m,n] = size(image);
+    resultImg = zeros(m/factor,n/factor);
+    k=1;
+    l=1;
+    <span class="keyword">for</span> i=1:m
+        <span class="keyword">for</span> j=1:n
+            <span class="keyword">if</span>((mod(i,factor)==1) &amp;&amp; (mod(j,factor)==1))
+                resultImg((i+1)/2,(j+1)/2) = image(i,j);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="5">2D COnolution with cropping at the edges</h2><pre class="codeinput"><span class="keyword">function</span> [convImage] = convolution(image, kernel)
+    [m,n] = size(image);
+    kernelSize = size(kernel,1);
+    ctr = (kernelSize+1)/2;
+    convImage = image;
+    <span class="keyword">for</span> i=1:m
+        <span class="keyword">for</span> j=1:n
+            <span class="keyword">if</span>((i&gt;=ctr) &amp;&amp; (i&lt;=(m-ctr+1)) &amp;&amp; (j&gt;=ctr) &amp;&amp; (j&lt;=(n-ctr+1)))
+                term = image((i-ctr+1):(i+ctr-1),(j-ctr+1):(j+ctr-1)).*kernel;
+                convImage(i,j) = sum(term,<span class="string">'all'</span>);
+            <span class="keyword">elseif</span>((i&lt;ctr))
+                <span class="keyword">if</span>(j&lt;ctr)
+                    new_kernel=kernel((ctr-i+1):end,(ctr-j+1):end);
+                    new_kernel=new_kernel./sum(new_kernel,<span class="string">'all'</span>);
+                    term = image(1:(i+ctr-1),1:(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,<span class="string">'all'</span>);
+                <span class="keyword">elseif</span>(j&gt;(n-ctr+1))
+                    new_kernel=kernel((ctr-i+1):end,1:(ctr+n-j));
+                    new_kernel=new_kernel./sum(new_kernel,<span class="string">'all'</span>);
+                    term = image(1:(i+ctr-1),(j-ctr+1):end).*new_kernel;
+                    convImage(i,j) = sum(term,<span class="string">'all'</span>);
+                <span class="keyword">else</span>
+                    new_kernel=kernel((ctr-i+1):end,1:end);
+                    new_kernel=new_kernel./sum(new_kernel,<span class="string">'all'</span>);
+                    term = image(1:(i+ctr-1),(j-ctr+1):(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,<span class="string">'all'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">elseif</span>(i&gt;(m-ctr+1))
+                <span class="keyword">if</span>(j&lt;ctr)
+                    new_kernel=kernel(1:(ctr+m-i),(ctr-j+1):end);
+                    new_kernel=new_kernel./sum(new_kernel,<span class="string">'all'</span>);
+                    term = image((i-ctr+1):end,1:(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,<span class="string">'all'</span>);
+                <span class="keyword">elseif</span>(j&gt;(n-ctr+1))
+                    new_kernel=kernel(1:(ctr+m-i),1:(ctr+n-j));
+                    new_kernel=new_kernel./sum(new_kernel,<span class="string">'all'</span>);
+                    term = image((i-ctr+1):end,(j-ctr+1):end).*new_kernel;
+                    convImage(i,j) = sum(term,<span class="string">'all'</span>);
+                <span class="keyword">else</span>
+                    new_kernel=kernel(1:(ctr+m-i),1:end);
+                    new_kernel=new_kernel./sum(new_kernel,<span class="string">'all'</span>);
+                    term = image((i-ctr+1):end,(j-ctr+1):(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,<span class="string">'all'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="6">Gaussian Kernel constructing function</h2><pre class="codeinput"><span class="keyword">function</span> [Gaussian] = constructGaussian(sd,size)
+    ctr = (size+1)/2;
+    Gaussian = zeros(size, size);
+    <span class="keyword">for</span> i = 1:size
+        <span class="keyword">for</span> j = 1:size
+            Gaussian(i,j) = gaussian((i-ctr),(j-ctr));
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    Gaussian = Gaussian.*sd;
+    Gaussian = Gaussian./sum(Gaussian,<span class="string">'all'</span>);
+<span class="keyword">end</span>
+</pre><h2 id="7">Utility function for constructGaussian</h2><pre class="codeinput"><span class="keyword">function</span> val = gaussian(x,y)
+    val = (1/sqrt(2*pi))*exp(-((x^2)+(y^2))/(2));
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MyMainScript
+
+tic;
+%% Gaussian Blurring and subsampling for Barbara image
+%%sampleImg = myPatchBasedFiltering("../data/barbara.mat", "mat");
+load("../data/barbara.mat", 'imageOrig')
+imageOrig = imageOrig./100;
+kernel_gauss = constructGaussian(0.66,9);
+sampleImg = convolution(imageOrig, kernel_gauss);
+sampleImg = subSampler(sampleImg,2);
+%{
+disp(size(imageOrig));
+disp(size(sampleImg));
+subplot(1,2,1), imshow(imageOrig);
+subplot(1,2,2), imshow(sampleImg);
+%}
+%% Keep last parameter of myPatchBaseFiltering as 'y' for performing hyperparameter tuning and keep it as 'n' for gewnerating optimal rmsd results.
+result_RMSD1 = myPatchBasedFiltering(sampleImg, "im", "barbara",'n');
+result_RMSD2 = myPatchBasedFiltering("../data/grass.png", "png", "grass",'n');
+result_RMSD3 = myPatchBasedFiltering("../data/honeyCombReal.png", "png", "honeycomb",'n');
+toc;
+%% Sub sampling Function
+function [resultImg] = subSampler(image,factor)
+    [m,n] = size(image);
+    resultImg = zeros(m/factor,n/factor);
+    k=1;
+    l=1;
+    for i=1:m
+        for j=1:n
+            if((mod(i,factor)==1) && (mod(j,factor)==1))
+                resultImg((i+1)/2,(j+1)/2) = image(i,j);
+            end
+        end
+    end
+end
+%% 2D COnolution with cropping at the edges
+function [convImage] = convolution(image, kernel)
+    [m,n] = size(image);
+    kernelSize = size(kernel,1);
+    ctr = (kernelSize+1)/2;
+    convImage = image;
+    for i=1:m
+        for j=1:n
+            if((i>=ctr) && (i<=(m-ctr+1)) && (j>=ctr) && (j<=(n-ctr+1)))
+                term = image((i-ctr+1):(i+ctr-1),(j-ctr+1):(j+ctr-1)).*kernel;
+                convImage(i,j) = sum(term,'all');
+            elseif((i<ctr))
+                if(j<ctr)
+                    new_kernel=kernel((ctr-i+1):end,(ctr-j+1):end);
+                    new_kernel=new_kernel./sum(new_kernel,'all');
+                    term = image(1:(i+ctr-1),1:(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,'all');
+                elseif(j>(n-ctr+1))
+                    new_kernel=kernel((ctr-i+1):end,1:(ctr+n-j));
+                    new_kernel=new_kernel./sum(new_kernel,'all');
+                    term = image(1:(i+ctr-1),(j-ctr+1):end).*new_kernel;
+                    convImage(i,j) = sum(term,'all');
+                else
+                    new_kernel=kernel((ctr-i+1):end,1:end);
+                    new_kernel=new_kernel./sum(new_kernel,'all');
+                    term = image(1:(i+ctr-1),(j-ctr+1):(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,'all');
+                end
+            elseif(i>(m-ctr+1))
+                if(j<ctr)
+                    new_kernel=kernel(1:(ctr+m-i),(ctr-j+1):end);
+                    new_kernel=new_kernel./sum(new_kernel,'all');
+                    term = image((i-ctr+1):end,1:(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,'all');
+                elseif(j>(n-ctr+1))
+                    new_kernel=kernel(1:(ctr+m-i),1:(ctr+n-j));
+                    new_kernel=new_kernel./sum(new_kernel,'all');
+                    term = image((i-ctr+1):end,(j-ctr+1):end).*new_kernel;
+                    convImage(i,j) = sum(term,'all');
+                else
+                    new_kernel=kernel(1:(ctr+m-i),1:end);
+                    new_kernel=new_kernel./sum(new_kernel,'all');
+                    term = image((i-ctr+1):end,(j-ctr+1):(j+ctr-1)).*new_kernel;
+                    convImage(i,j) = sum(term,'all');
+                end
+            end
+        end
+    end
+end
+%% Gaussian Kernel constructing function
+function [Gaussian] = constructGaussian(sd,size)
+    ctr = (size+1)/2;
+    Gaussian = zeros(size, size);
+    for i = 1:size
+        for j = 1:size
+            Gaussian(i,j) = gaussian((i-ctr),(j-ctr));
+        end
+    end
+    Gaussian = Gaussian.*sd;
+    Gaussian = Gaussian./sum(Gaussian,'all');
+end
+%% Utility function for constructGaussian
+function val = gaussian(x,y)
+    val = (1/sqrt(2*pi))*exp(-((x^2)+(y^2))/(2));
+end
+##### SOURCE END #####
+--></body></html>
